@@ -8,6 +8,8 @@ const router = express.Router();
 
 router.get("/", auth, ctrlWrapper(ctrl.listContacts));
 
+router.get("/", auth, ctrlWrapper(ctrl.chooseFavoriteContacts));
+
 router.get("/:id", ctrlWrapper(ctrl.getById));
 
 router.post("/", auth, validation(joiSchema), ctrlWrapper(ctrl.addContact));
