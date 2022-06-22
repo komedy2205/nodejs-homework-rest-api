@@ -12,6 +12,7 @@ const app = express();
 app.use(logger(app.get("env") === "development" ? "dev" : "short"));
 app.use(cors());
 app.use(express.json());
+app.use(express.static("public"));
 
 app.use("/api/users", authRouter);
 app.use("/api/users", usersRouter);
