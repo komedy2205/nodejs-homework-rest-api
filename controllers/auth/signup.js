@@ -1,6 +1,9 @@
-const { User } = require("../../models");
 const bcrypt = require("bcryptjs");
 const gravatar = require("gravatar");
+const { v4: uuidv4 } = require("uuid");
+
+const { sendMail } = require("../../helpers");
+const { User } = require("../../models");
 
 const signup = async (req, res) => {
   const { email, password, subscription } = req.body;
@@ -14,6 +17,7 @@ const signup = async (req, res) => {
       },
     });
   }
+  const verificationToken = uuidv4();
   const avatarURL = gravatar.url(email);
   const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
   await User.create({
@@ -21,7 +25,16 @@ const signup = async (req, res) => {
     password: hashedPassword,
     avatarURL,
     subscription,
+    verificationToken,
   });
+  const mail = {
+    to: email,
+    subject: "Підтвердження email",
+    html: `<a target="_blank" href="localhost:3000/api/users/verify/${verificationToken}">Натисніть для підтвердження email</a>`,
+  };
+
+  await sendMail(mail);
+
   res.status(201).json({
     status: "success",
     code: 201,
@@ -29,6 +42,7 @@ const signup = async (req, res) => {
       email,
       subscription,
       avatarURL,
+      verificationToken,
     },
   });
 };
